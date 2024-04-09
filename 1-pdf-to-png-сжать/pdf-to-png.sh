@@ -7,15 +7,15 @@ find . -type d -exec mkdir -p ../Output/{} \;
 
 
 # Нахожу все файлы в папке Input рекурсивно
-# Если файл pdf - конвертирую его, если другого типа - копирую
-# Сжимаю png с помощью pngquant
+# Если файл pdf - конвертирую и уменьшаю его, если другого типа - копирую
 find . -type f | while read file; do
   if [[ "$file" == *.pdf ]]; then
-    file_output="${file%.pdf}.png"
-    convert -density 100 "$file" -quality 90 -background white -flatten "../Output/$file_output"
-    pngquant --quality=10-20 "../Output/$file_output" --ext .png --force
+    file_output="../Output/${file%.pdf}.png"
+    convert -density 100 "$file" -quality 90 -background white -flatten "$file_output"
+    pngquant --quality=10-20 "$file_output" --ext .png --force
   else
     cp "$file" "../Output/$file"
   fi
 done
+
 
