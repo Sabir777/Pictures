@@ -2,5 +2,5 @@
 **/*.png
 **/*.jpg
 **/[Oo]utput/
-**/Input/
+**/Input/*
 !**/Input/.input
