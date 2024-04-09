@@ -1,18 +1,21 @@
 #!/bin/bash
 
-# Проверяем, существует ли каталог "Output"
-if [ ! -d "Output" ]; then
-  mkdir "Output"  # Создаем каталог, если его нет
-fi
+# Копирую структуру папок из папки Input в Output
+cd Input
+# Копирую только папки без файлов
+find . -type d -exec mkdir -p ../Output/{} \;
 
-# Преобразую пдф в png с незначительным сжатием
-# Сохраняю файлы в парке Output
-for file in $(ls *.pdf); do
-  file_output="${file%.pdf}.png"
-  convert -density 100 "$file" -quality 90 -background white -flatten "Output/$file_output"
+
+# Нахожу все файлы в папке Input рекурсивно
+# Если файл pdf - конвертирую его, если другого типа - копирую
+# Сжимаю png с помощью pngquant
+find . -type f | while read file; do
+  if [[ "$file" == *.pdf ]]; then
+    file_output="${file%.pdf}.png"
+    convert -density 100 "$file" -quality 90 -background white -flatten "../Output/$file_output"
+    pngquant --quality=10-20 "../Output/$file_output" --ext .png --force
+  else
+    cp "$file" "../Output/$file"
+  fi
 done
-
-# Перехожу в папку с созданными файлами и сжимаю их утилитой pngquant
-cd Output
-pngquant --quality=10-20 *.png --ext .png --force
 
