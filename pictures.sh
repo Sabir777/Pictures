@@ -31,7 +31,7 @@ tmux send-keys -t Pictures:2.1 'cd 2-pdf-to-png-убрать-фон ; vim убр
 # создаю окно "pic-3" в сессии Pictures
 tmux new-window -n pic-3 -t Pictures
 
-# Открываю в vim "убрать_фон.sh"
+# Открываю в vim "сжать_фото.sh"
 tmux send-keys -t Pictures:3.1 'cd 3-уменьшить-фото-в-папках ; vim сжать_фото.sh' C-m
 
 
