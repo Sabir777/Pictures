@@ -35,6 +35,14 @@ tmux new-window -n pic-3 -t Pictures
 tmux send-keys -t Pictures:3.1 'cd 3-уменьшить-фото-в-папках ; vim сжать_фото.sh' C-m
 
 
+# Запускаю 4-е окно: 4-добавить-пустое-место
+# создаю окно "pic-4" в сессии Pictures
+tmux new-window -n pic-4 -t Pictures
+
+# Открываю в vim "добавить_место.sh"
+tmux send-keys -t Pictures:4.1 'cd 4-добавить-пустое-место ; vim добавить_место.sh' C-m
+
+
 # Подключаюсь к сессии "Pictures"      
 tmux attach -t Pictures
 
