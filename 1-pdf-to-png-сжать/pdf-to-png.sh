@@ -19,7 +19,7 @@ find . -type d -exec mkdir -p ../Output/{} \;
 find . -type f | while read file; do
   if [[ "$file" == *.pdf ]]; then
     file_output="../Output/${file%.pdf}.png"
-    magick -density 100 "$file" -quality 90 -background white -flatten "$file_output"
+    convert -density 100 "$file" -quality 90 -background white -flatten "$file_output"
     pngquant --quality=10-20 "$file_output" --ext .png --force
   else
     cp "$file" "../Output/$file"
