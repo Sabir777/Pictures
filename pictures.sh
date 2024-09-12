@@ -43,6 +43,13 @@ tmux new-window -n pic-4 -t Pictures
 tmux send-keys -t Pictures:4.1 'cd 4-добавить-пустое-место ; vim добавить_место.sh' C-m
 
 
+# Запускаю 5-е окно: 5-сжать-pdf
+# создаю окно "pic-5" в сессии Pictures
+tmux new-window -n pic-5 -t Pictures
+
+# Открываю в vim "сжать_pdf.sh"
+tmux send-keys -t Pictures:5.1 'cd 5-сжать-pdf ; vim сжать_pdf.sh' C-m
+
 # Подключаюсь к сессии "Pictures"      
 tmux attach -t Pictures
 
