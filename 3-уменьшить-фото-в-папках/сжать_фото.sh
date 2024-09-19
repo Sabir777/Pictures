@@ -15,7 +15,7 @@ find . -type d -exec mkdir -p ../Output/{} \;
 # Нахожу все файлы в папке Input рекурсивно
 # Если файл jpg - конвертирую его, если другого типа - копирую
 find . -type f | while read file; do
-  if [[ "$file" == *.jpg ]]; then
+  if [[ "$file" == *.jpg || "$file" == *.JPG ]]; then
     convert "$file" -resize 25% -quality 20 "../Output/$file"
   else
     cp "$file" "../Output/$file"
