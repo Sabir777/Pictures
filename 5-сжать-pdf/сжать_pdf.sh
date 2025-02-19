@@ -20,8 +20,6 @@ find . -type d -exec mkdir -p ../Output/{} \;
 # Если файл pdf - сжимаю его, если другого типа - копирую
 find . -type f | while read file; do
   if [[ "$file" == *.pdf || "$file" == *.PDF ]]; then
-    # magick "$file" -resize 25% -quality 20 "../Output/$file"
-    # file_temp="../Output/${file%.pdf}.png"
     # копирую pdf-файл в папку temp
     cp "$file" ../temp/
 
@@ -31,7 +29,7 @@ find . -type f | while read file; do
     # определяю имя pdf-файла
     pdf_file=$(basename "$file")
 
-    # получаю png-страницы из pdf (сжатие)
+    # получаю png-страницы из pdf (сжатие) - Chostscript
     gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -r100 -sOutputFile="page_%04d.png" "$pdf_file"
 
     # сжимаю png-страницы
