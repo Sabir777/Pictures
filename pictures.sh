@@ -50,6 +50,15 @@ tmux new-window -n pic-5 -t Pictures
 # Открываю в vim "сжать_pdf.sh"
 tmux send-keys -t Pictures:5.1 'cd 5-сжать-pdf ; vim сжать_pdf.sh' C-m
 
+
+# Запускаю 6-е окно: 6-преобразовать-pdf-в-png
+# создаю окно "pic-6" в сессии Pictures
+tmux new-window -n pic-6 -t Pictures
+
+# Открываю в vim "сжать_pdf.sh"
+tmux send-keys -t Pictures:6.1 'cd 6-преобразовать-pdf-в-png ; vim конвертировать-pdf-в-png.sh' C-m
+
+
 # Подключаюсь к сессии "Pictures"      
 tmux attach -t Pictures
 
