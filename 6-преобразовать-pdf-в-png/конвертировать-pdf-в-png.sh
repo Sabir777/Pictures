@@ -27,7 +27,7 @@ find . -type f | while read file; do
 
     # Создаю директорию по имени файла
     dir_file="../Output/$file"
-    mkdir "$dir_file"
+    mkdir -p "$dir_file"
 
     # определяю имя pdf-файла
     pdf_file=$(basename "$file")
@@ -39,22 +39,11 @@ find . -type f | while read file; do
     # Перехожу в папку с именем pdf-файла
     cd "$dir_file"
 
-    # получаю png-страницы из pdf (сжатие) - Chostscript
-    gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -r100 -sOutputFile="%04d.png" "$pdf_file"
+    # получаю png-страницы из pdf (poppler-utils) сжатие -r 90 (90DPI)
+    pdftoppm -png -r 90 "$pdf_file" "${pdf_file%.*}"
 
     # сжимаю png-страницы
     pngquant --quality=10-20 *.png --ext .png --force
-
-    # удаляю pdf-файл
-    rm "$pdf_file"
-
-    # получаю имя без расширения
-    name=${pdf_file%.*}
-
-    # переименовываю png-файлы
-    for file in *.png; do
-      mv "$file" "${name}-$file"
-    done
 
     # возвращаюсь в базовую директорию
     cd "$base_dir"
