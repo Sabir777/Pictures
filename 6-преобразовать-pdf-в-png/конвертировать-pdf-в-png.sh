@@ -45,6 +45,9 @@ find . -type f | while read file; do
     # сжимаю png-страницы
     pngquant --quality=10-20 *.png --ext .png --force
 
+    # удаляю pdf-файл в Output
+    rm "$pdf_file"
+
     # возвращаюсь в базовую директорию
     cd "$base_dir"
 
