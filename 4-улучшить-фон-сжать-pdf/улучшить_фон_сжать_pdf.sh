@@ -10,54 +10,26 @@
 
 # Функция для сжатия PDF с осветлением фона
 compress_pdf() {
-
-    # Имя страницы
-    output_pdf="$1"
+    input_pdf="$1"
     output_png="output.png"
 
-    #---------------Первый проход---------------#
-    # Преобразование PDF в PNG с пониженным разрешением
-    convert -density 200 "$output_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
+    # Преобразуем PDF в PNG с высоким разрешением и осветляем фон
+    convert -density 600 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
 
-    # Применяем фильтр для выделения контуров, чтобы линии стали более жирными
-    convert "$output_png" -blur 0x1 -sharpen 0x1 -level 30%,100% "$output_png"
+    # Улучшаем контраст, делаем линии жирнее
+    convert "$output_png" -blur 0x2 -sharpen 0x10 -level 80%,100% "$output_png"
 
-    # Добавление белого фона (чтобы фон был белым вместо прозрачного)
+    # Убираем прозрачность и добавляем белый фон
     convert "$output_png" -background white -alpha remove -alpha off "$output_png"
 
-    # Сжимаем PNG с помощью pngquant (повышенная степень сжатия)
-    pngquant --quality=5-15 "$output_png" --ext .png --force
+    # Сжимаем PNG, но не агрессивно
+    pngquant --quality=10-20 "$output_png" --ext .png --force
 
-    # Преобразование PNG обратно в PDF
-    convert "$output_png" "$output_pdf"
+    # Преобразуем обратно в PDF
+    convert "$output_png" "$input_pdf"
 
-
-    #---------------Второй проход---------------#
-    # Преобразую в png со снижением разрешения
-    convert -density 150 "$output_pdf" "$output_png"
-
-    # Применяем фильтр для выделения контуров, чтобы линии стали более жирными
-    convert "$output_png" -blur 0x1 -sharpen 0x1 -level 30%,100% "$output_png"
-
-    # Сжимаем PNG с помощью pngquant (повышенная степень сжатия)
-    pngquant --quality=5-15 "$output_png" --ext .png --force
-
-    # Преобразование PNG обратно в PDF
-    convert "$output_png" "$output_pdf"
-
-
-    #---------------Третий проход---------------#
-    # Преобразование PDF в PNG с пониженным разрешением
-    convert -density 130 "$output_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
-
-    # Добавление белого фона (чтобы фон был белым вместо прозрачного)
-    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
-
-    # Сжимаем PNG с помощью pngquant (повышенная степень сжатия)
-    pngquant --quality=5-15 "$output_png" --ext .png --force
-
-    # Преобразование PNG обратно в PDF
-    convert "$output_png" "$output_pdf"
+    # Удаляем временный PNG
+    rm "$output_png"
 }
 
 
@@ -110,11 +82,11 @@ find . -type f | while read file; do
          -dPDFSETTINGS=/screen \
          -dEmbedAllFonts=true -dSubsetFonts=true \
          -dColorImageDownsampleType=/Bicubic \
-         -dColorImageResolution=144 \
+         -dColorImageResolution=130 \
          -dGrayImageDownsampleType=/Bicubic \
-         -dGrayImageResolution=144 \
+         -dGrayImageResolution=130 \
          -dMonoImageDownsampleType=/Subsample \
-         -dMonoImageResolution=144 \
+         -dMonoImageResolution=130 \
          -sOutputFile="../Output/$file" \
          "$pdf_file"
 
