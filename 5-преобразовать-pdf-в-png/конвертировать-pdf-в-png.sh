@@ -4,11 +4,30 @@
 
 # Копирование директорий
 # Конвертировать pdf в png: пакетная обработка
+# Вместо PDF-файла  будет создана папка с тем же именем в которой будут находиться PNG-страницы
 # Результат в папке Output
 
 
-# Создаю временную папку temp
-# mkdir -p temp
+# Функция для преобразования PDF-страницы в PNG-картинку
+# Дополнительно производится: 1) Осветление фона; 2) Сжатие картинки
+pdf_to_png() {
+    input_pdf="$1"
+    output_png="${input_pdf/%.pdf/.png}"
+
+    # Преобразуем PDF в PNG с высоким разрешением и осветляем фон
+    convert -density 600 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
+
+    # Улучшаем контраст, делаем линии жирнее
+    convert "$output_png" -blur 0x2 -sharpen 0x10 -level 80%,100% "$output_png"
+
+    # Убираем прозрачность и добавляем белый фон
+    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
+
+    # Сжимаем PNG
+    pngquant --quality=10-20 "$output_png" --ext .png --force
+}
+
+
 
 # Копирую структуру папок из папки Input в Output
 cd Input
@@ -39,11 +58,19 @@ find . -type f | while read file; do
     # Перехожу в папку с именем pdf-файла
     cd "$dir_file"
 
-    # получаю png-страницы из pdf (poppler-utils) сжатие -r 90 (90DPI)
-    pdftoppm -png -r 90 "$pdf_file" "${pdf_file%.*}"
+    # Разбираю PDF-файл на отдельные файлы (страницы документа)
+    gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="${pdf_file}_%04d.pdf" "$pdf_file"
 
-    # сжимаю png-страницы
-    pngquant --quality=10-20 *.png --ext .png --force
+    # Удаляю оригинальный PDF-файл
+    rm "$pdf_file"
+
+    # Конвертирую PDF-страницы в PNG-формат
+    for page in *.pdf; do
+        pdf_to_png "$page"
+    done
+
+    # Удаляю исходные PDF-страницы
+    rm *.pdf
 
     # возвращаюсь в базовую директорию
     cd "$base_dir"
