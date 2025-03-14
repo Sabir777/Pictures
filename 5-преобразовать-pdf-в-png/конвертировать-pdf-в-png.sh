@@ -14,17 +14,44 @@ pdf_to_png() {
     input_pdf="$1"
     output_png="${input_pdf/%.pdf/.png}"
 
-    # Преобразуем PDF в PNG с высоким разрешением и осветляем фон
+    #---------------Первый проход---------------#
+    # Преобразую PDF в PNG с высоким разрешением и осветляю фон
     convert -density 600 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
 
-    # Улучшаем контраст, делаем линии жирнее
-    convert "$output_png" -blur 0x2 -sharpen 0x10 -level 80%,100% "$output_png"
+    # Улучшаю контраст, делаю линии жирнее
+    convert "$output_png" -blur 0x0.5 -sharpen 0x1 -level 80%,100% "$output_png"
 
-    # Убираем прозрачность и добавляем белый фон
+    # Убираю прозрачность и добавляю белый фон
     convert "$output_png" -background white -alpha remove -alpha off "$output_png"
 
-    # Сжимаем PNG
+    # Сжимаю PNG
     pngquant --quality=10-20 "$output_png" --ext .png --force
+
+    # Преобразую PNG обратно в PDF
+    convert "$output_png" "$input_pdf"
+
+    #---------------Второй проход---------------#
+    # Преобразую в png со снижением разрешения
+    convert -density 150 "$input_pdf" "$output_png"
+
+    # Улучшаю контраст, делаю линии жирнее
+    convert "$output_png" -blur 0x0.5 -sharpen 0x1 -level 80%,100% "$output_png"
+    # Сжимаю PNG
+    pngquant --quality=10-20 "$output_png" --ext .png --force
+
+    # Преобразование PNG обратно в PDF
+    convert "$output_png" "$input_pdf"
+
+    #---------------Третий проход---------------#
+    # Преобразование PDF в PNG с пониженным разрешением
+    convert -density 130 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
+
+    # Добавление белого фона (чтобы фон был белым вместо прозрачного)
+    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
+
+    # Сжимаем PNG с помощью pngquant (повышенная степень сжатия)
+    pngquant --quality=10-20 "$output_png" --ext .png --force
+
 }
 
 
@@ -59,7 +86,7 @@ find . -type f | while read file; do
     cd "$dir_file"
 
     # Разбираю PDF-файл на отдельные файлы (страницы документа)
-    gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="${pdf_file}_%04d.pdf" "$pdf_file"
+    gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="${pdf_file%.*}_%04d.pdf" "$pdf_file"
 
     # Удаляю оригинальный PDF-файл
     rm "$pdf_file"
