@@ -14,44 +14,42 @@ pdf_to_png() {
     input_pdf="$1"
     output_png="${input_pdf/%.pdf/.png}"
 
-    #---------------Первый проход---------------#
-    # Преобразую PDF в PNG с высоким разрешением и осветляю фон
-    convert -density 600 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
+    gs -dNOPAUSE -dBATCH -q \
+       -sDEVICE=png16m \
+       -r130 \
+       -sOutputFile="$output_png" \
+       "$input_pdf"
 
-    # Улучшаю контраст, делаю линии жирнее
-    convert "$output_png" -blur 0x0.5 -sharpen 0x1 -level 80%,100% "$output_png"
+    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.5 -sharpen 0x5 -level 40%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
-    # Убираю прозрачность и добавляю белый фон
-    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
+    pngquant --quality=20-40 --speed 1 --ext .png --force "$output_png"
 
-    # Сжимаю PNG
-    pngquant --quality=10-20 "$output_png" --ext .png --force
+    optipng -o7 -strip all -quiet "$output_png"
 
-    # Преобразую PNG обратно в PDF
-    convert "$output_png" "$input_pdf"
+    # Финальное сжатие от Google (Zopfli)
+    tmp_file="${output_png}.tmp"
+    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
 
-    #---------------Второй проход---------------#
-    # Преобразую в png со снижением разрешения
-    convert -density 150 "$input_pdf" "$output_png"
 
-    # Улучшаю контраст, делаю линии жирнее
-    convert "$output_png" -blur 0x0.5 -sharpen 0x1 -level 80%,100% "$output_png"
-    # Сжимаю PNG
-    pngquant --quality=10-20 "$output_png" --ext .png --force
+    # Второй проход сжатия (дополнительное уменьшение размера)
+    convert "$output_png" -density 60 "$output_png"
+    pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
 
-    # Преобразование PNG обратно в PDF
-    convert "$output_png" "$input_pdf"
+    optipng -o7 -strip all -quiet "$output_png"
 
-    #---------------Третий проход---------------#
-    # Преобразование PDF в PNG с пониженным разрешением
-    convert -density 130 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
+    # Финальное сжатие от Google (Zopfli)
+    tmp_file="${output_png}.tmp"
+    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
 
-    # Добавление белого фона (чтобы фон был белым вместо прозрачного)
-    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
+    # Третий проход сжатия (дополнительное уменьшение размера)
+    convert "$output_png" -density 20 "$output_png"
+    pngquant --quality=5-10 --speed 1 --ext .png --force "$output_png"
 
-    # Сжимаем PNG с помощью pngquant (повышенная степень сжатия)
-    pngquant --quality=10-20 "$output_png" --ext .png --force
+    optipng -o7 -strip all -quiet "$output_png"
 
+    # Финальное сжатие от Google (Zopfli)
+    tmp_file="${output_png}.tmp"
+    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
 }
 
 
