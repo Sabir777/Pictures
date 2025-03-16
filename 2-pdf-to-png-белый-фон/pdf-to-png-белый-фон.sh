@@ -15,6 +15,7 @@ pdf_to_png() {
     input_pdf="$1"
     output_png="${input_pdf/%.pdf/.png}"
 
+    # Получаю png из pdf
     gs -dNOPAUSE -dBATCH -q \
        -sDEVICE=png16m \
        -r130 \
