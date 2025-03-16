@@ -30,9 +30,9 @@ find . -type d -exec mkdir -p ../Output/{} \;
 
 
 # Нахожу все файлы в папке Input рекурсивно
-# Если файл jpg - конвертирую его, если другого типа - копирую
+# Если файл jpg или png - конвертирую его, если другого типа - копирую
 find . -type f | while read file; do
-  if [[ "$file" == *.jpg || "$file" == *.png ]]; then
+  if [[ "$file" == *.jpg || "$file" == *.png || "$file" == *.JPG || "$file" == *.PNG ]]; then
     convert "$file" -gravity north -background white -splice "$up" -gravity south -background white -splice "$down" -gravity west -background white -splice "$left" -gravity east -background white -splice "$right" "../Output/$file"
   else
     cp "$file" "../Output/$file"
