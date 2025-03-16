@@ -16,14 +16,7 @@ pdf_to_png() {
     output_png="${input_pdf/%.pdf/.png}"
 
     # Получаю png из pdf
-    gs -dNOPAUSE -dBATCH -q \
-       -sDEVICE=png16m \
-       -r500 \
-       -sOutputFile="$output_png" \
-       "$input_pdf"
-
-    # Улучшение контраста и увеличение толщины линий
-    convert "$output_png" -alpha off -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond "$output_png"
+    convert -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
 
     # Сжатие png
     pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
