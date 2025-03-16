@@ -13,22 +13,31 @@ compress_pdf() {
     input_pdf="$1"
     output_png="output.png"
 
-    # Преобразуем PDF в PNG с высоким разрешением и осветляем фон
-    convert -density 600 "$input_pdf" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast "$output_png"
 
-    # Улучшаем контраст, делаем линии жирнее
-    convert "$output_png" -blur 0x2 -sharpen 0x10 -level 80%,100% "$output_png"
+    # Получаю png из pdf
+    gs -dNOPAUSE -dBATCH -q \
+       -sDEVICE=png16m \
+       -r180 \
+       -sOutputFile="$output_png" \
+       "$input_pdf"
 
-    # Убираем прозрачность и добавляем белый фон
-    convert "$output_png" -background white -alpha remove -alpha off "$output_png"
+    # Осветление фона и увеличение толщины линий
+    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.1 -sharpen 0x5 -level 80%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
-    # Сжимаем PNG, но не агрессивно
-    pngquant --quality=10-20 "$output_png" --ext .png --force
+    # Сжатие png
+    pngquant --quality=5-10 --speed 1 --ext .png --force "$output_png"
 
-    # Преобразуем обратно в PDF
+    # Сжатие через оптимизацию
+    optipng -o7 -strip all -quiet "$output_png"
+
+    # Финальное сжатие от Google (Zopfli)
+    tmp_file="${output_png}.tmp"
+    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
+
+    # Преобразую PNG в PDF
     convert "$output_png" "$input_pdf"
 
-    # Удаляем временный PNG
+    # Удаляю временный PNG
     rm "$output_png"
 }
 
@@ -89,7 +98,6 @@ find . -type f | while read file; do
          -dMonoImageResolution=130 \
          -sOutputFile="../Output/$file" \
          "$pdf_file"
-
 
         # Удаляю pdf-файлы в папке temp
         rm "$base_dir"/../temp/*.pdf
