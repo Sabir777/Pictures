@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#----------5.Конвертировать pdf в png (сохранение директорий)----------#
+#-5.Конвертировать pdf в png (осветление фона и увеличение толщины линий)-#
 
+# Сжатие PNG на выходе
 # Копирование директорий
-# Конвертировать pdf в png: пакетная обработка
+# Конвертировать pdf в png: пакетная обработка (многостраничные pdf)
 # Вместо PDF-файла  будет создана папка с тем же именем в которой будут находиться PNG-страницы
 # Результат в папке Output
 
@@ -23,10 +24,10 @@ pdf_to_png() {
     # Осветление фона и увеличение толщины линий
     convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
-    # Уменьшение png
+    # Сжатие png
     pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
 
-    # Уменьшение через оптимизацию
+    # Сжатие через оптимизацию
     optipng -o7 -strip all -quiet "$output_png"
 
     # Финальное сжатие от Google (Zopfli)

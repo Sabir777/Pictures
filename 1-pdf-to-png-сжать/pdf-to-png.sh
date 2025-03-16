@@ -1,28 +1,90 @@
 #!/bin/bash
 
-#----------1.Перевод pdf в png (схемы)----------#
+#----------1.Перевод pdf в png (схемы; сохранение фона)----------#
 
-# Конвертация pdf в png
-# Программа рассчитана на одностраничные png
-# Копирование директорий, вместо pdf там будут png
-# Сжатие png
+# Сжатие PNG на выходе
+# Конвертировать pdf в png: пакетная обработка (многостраничные pdf)
+# Копирование директорий
+# Вместо PDF-файла  будет создана папка с тем же именем в которой будут находиться PNG-страницы
 # Результат в Output 
+
+
+# Функция для преобразования PDF-страницы в PNG-картинку
+# Дополнительно производится: 1) Повышение контраста; 2) Сжатие картинки
+pdf_to_png() {
+    input_pdf="$1"
+    output_png="${input_pdf/%.pdf/.png}"
+
+    # Получаю png из pdf
+    gs -dNOPAUSE -dBATCH -q \
+       -sDEVICE=png16m \
+       -r500 \
+       -sOutputFile="$output_png" \
+       "$input_pdf"
+
+    # Улучшение контраста и увеличение толщины линий
+    convert "$output_png" -alpha off -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond "$output_png"
+
+    # Сжатие png
+    pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
+
+    # Сжатие через оптимизацию
+    optipng -o7 -strip all -quiet "$output_png"
+
+    # Финальное сжатие от Google (Zopfli)
+    tmp_file="${output_png}.tmp"
+    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
+}
+
 
 # Копирую структуру папок из папки Input в Output
 cd Input
+
+# Запоминаю полное имя базовой директории
+base_dir=$(pwd)
+
 # Копирую только папки без файлов
 find . -type d -exec mkdir -p ../Output/{} \;
 
 
 # Нахожу все файлы в папке Input рекурсивно
-# Если файл pdf - конвертирую и уменьшаю его, если другого типа - копирую
+# Если файл pdf - сжимаю его, если другого типа - копирую
 find . -type f | while read file; do
-
   if [[ "$file" == *.pdf || "$file" == *.PDF ]]; then
-    file_output="../Output/${file%.pdf}.png"
-    convert -density 100 "$file" -quality 90 -background white -flatten "$file_output"
-    pngquant --quality=10-20 "$file_output" --ext .png --force
+
+    # Создаю директорию по имени файла
+    dir_file="../Output/$file"
+    mkdir -p "$dir_file"
+
+    # определяю имя pdf-файла
+    pdf_file=$(basename "$file")
+
+    # копирую pdf-файл в папку с именем файла
+    new_pdf="$dir_file/$pdf_file"
+    cp "$file" "$new_pdf" 
+
+    # Перехожу в папку с именем pdf-файла
+    cd "$dir_file"
+
+    # Разбираю PDF-файл на отдельные файлы (страницы документа)
+    gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="${pdf_file%.*}_%04d.pdf" "$pdf_file"
+
+    # Удаляю оригинальный PDF-файл
+    rm "$pdf_file"
+
+    # Конвертирую PDF-страницы в PNG-формат
+    for page in *.pdf; do
+        pdf_to_png "$page"
+    done
+
+    # Удаляю исходные PDF-страницы
+    rm *.pdf
+
+    # возвращаюсь в базовую директорию
+    cd "$base_dir"
+
   else
+    # если файл не pdf - копирую его
     cp "$file" "../Output/$file"
   fi
 done
