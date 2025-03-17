@@ -16,7 +16,7 @@ find . -type d -exec mkdir -p ../Output/{} \;
 # Если файл jpg - конвертирую его, если другого типа - копирую
 find . -type f | while read file; do
   if [[ "$file" == *.jpg || "$file" == *.JPG ]]; then
-    convert "$file" -resize 70% -quality 80 "../Output/${file/%.JPG/.jpg}"
+    magick "$file" -resize 70% -quality 80 "../Output/${file/%.JPG/.jpg}"
   else
     cp "$file" "../Output/$file"
   fi

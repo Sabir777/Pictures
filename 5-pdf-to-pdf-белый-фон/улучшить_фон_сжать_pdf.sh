@@ -22,7 +22,7 @@ compress_pdf() {
        "$input_pdf"
 
     # Осветление фона и увеличение толщины линий
-    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.1 -sharpen 0x5 -level 80%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
+    magick "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.1 -sharpen 0x5 -level 80%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
     # Сжатие png
     pngquant --quality=5-10 --speed 1 --ext .png --force "$output_png"
@@ -35,7 +35,7 @@ compress_pdf() {
     zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
 
     # Преобразую PNG в PDF
-    convert "$output_png" "$input_pdf"
+    magick "$output_png" "$input_pdf"
 
     # Удаляю временный PNG
     rm "$output_png"

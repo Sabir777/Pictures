@@ -16,7 +16,7 @@ pdf_to_png() {
     output_png="${input_pdf/%.pdf/.png}"
 
     # Получаю png из pdf
-    convert -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
+    magick -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
 
     # Сжатие png
     pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
