@@ -1,22 +1,29 @@
 #!/bin/bash
 
-#----------1.Перевод pdf в png (схемы; фон не меняется)----------#
+# 2.Конвертировать pdf в png (осветление фона и увеличение толщины линий)
 
 # Сжатие PNG на выходе
-# Конвертировать pdf в png: пакетная обработка (многостраничные pdf)
 # Копирование директорий
+# Конвертировать pdf в png: пакетная обработка (многостраничные pdf)
 # Вместо PDF-файла  будет создана папка с тем же именем в которой будут находиться PNG-страницы
-# Результат в Output 
+# Результат в папке Output
 
 
 # Функция для преобразования PDF-страницы в PNG-картинку
-# Дополнительно производится: 1) Повышение контраста; 2) Сжатие картинки
+# Дополнительно производится: 1) Осветление фона; 2) Сжатие картинки
 pdf_to_png() {
     input_pdf="$1"
     output_png="${input_pdf/%.pdf/.png}"
 
     # Получаю png из pdf
-    convert -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
+    gs -dNOPAUSE -dBATCH -q \
+       -sDEVICE=png16m \
+       -r130 \
+       -sOutputFile="$output_png" \
+       "$input_pdf"
+
+    # Осветление фона и увеличение толщины линий
+    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
     # Сжатие png
     pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
@@ -28,6 +35,7 @@ pdf_to_png() {
     tmp_file="${output_png}.tmp"
     zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
 }
+
 
 
 # Копирую структуру папок из папки Input в Output

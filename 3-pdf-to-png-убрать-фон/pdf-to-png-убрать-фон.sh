@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#-------------Удаление фона---------------#
+#-------------3.Удаление фона---------------#
 
 # Преобразовать pdf в папке Input в png с удалением фона
 # Результат в папке Output
@@ -14,7 +14,7 @@ mkdir -p Output
 for file in Input/*.pdf; do
   filename=$(basename "$file")
   file_output="Output/${filename%.pdf}.png"
-  magick -density 100 "$file" -alpha off -fuzz 10% -transparent white -quality 90 "$file_output"
+  convert -density 100 "$file" -alpha off -fuzz 10% -transparent white -quality 90 "$file_output"
 done
 
 # Перехожу в папку с созданными файлами и сжимаю их утилитой pngquant
