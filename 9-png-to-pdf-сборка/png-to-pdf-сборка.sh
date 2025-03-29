@@ -1,33 +1,11 @@
 #!/bin/bash
 
-#----------1.Перевод pdf в png (схемы; фон не меняется)----------#
+#-------9.Сборка PDF из PNG-страниц------#
 
-# Сжатие PNG на выходе
-# Конвертировать pdf в png: пакетная обработка (многостраничные pdf)
-# Копирование директорий
-# Вместо PDF-файла  будет создана папка с тем же именем в которой будут находиться PNG-страницы
-# Результат в Output 
+# Преобразовать png в папке Input в pdf
+# Результат в папке Output
+# Если папка в которой находятся png-страницы называется *.pdf (*.PDF) то удаляю png-страницы и если папка пуста, удаляю саму папку; Готовый pdf-файл перемещаю на уровень выше (..)
 
-
-# Функция для преобразования PDF-страницы в PNG-картинку
-# Дополнительно производится: Сжатие картинки
-pdf_to_png() {
-    input_pdf="$1"
-    output_png="${input_pdf/%.pdf/.png}"
-
-    # Получаю png из pdf
-    magick -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
-
-    # Сжатие png
-    pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
-
-    # Сжатие через оптимизацию
-    optipng -o7 -strip all -quiet "$output_png"
-
-    # Финальное сжатие от Google (Zopfli)
-    tmp_file="${output_png}.tmp"
-    zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
-}
 
 
 # Копирую структуру папок из папки Input в Output
