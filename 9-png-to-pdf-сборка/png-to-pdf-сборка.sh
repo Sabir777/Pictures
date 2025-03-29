@@ -17,46 +17,31 @@ base_dir=$(pwd)
 # Копирую только папки без файлов
 find . -type d -exec mkdir -p ../Output/{} \;
 
-
-# Нахожу все файлы в папке Input рекурсивно
-# Если файл pdf - сжимаю его, если другого типа - копирую
+# Копирую файлы в подобную директорию
 find . -type f | while read file; do
-  if [[ "$file" == *.pdf || "$file" == *.PDF ]]; then
+    cp "$file" "../Output/$file"
+done
 
-    # Создаю директорию по имени файла
-    dir_file="../Output/$file"
-    mkdir -p "$dir_file"
 
-    # определяю имя pdf-файла
-    pdf_file=$(basename "$file")
+# Перебираю рекурсивно все папки: в каждой директории проверяю наличие png-файлов и собираю pdf-файл
+find . -type d | while read folder; do
 
-    # копирую pdf-файл в папку с именем файла
-    new_pdf="$dir_file/$pdf_file"
-    cp "$file" "$new_pdf" 
+    # Перехожу в каждую из папок
+    cd "$folder"
 
-    # Перехожу в папку с именем pdf-файла
-    cd "$dir_file"
+    # Собираю pdf-файл
+    # ???
 
-    # Разбираю PDF-файл на отдельные файлы (страницы документа)
-    gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="${pdf_file%.*}_%04d.pdf" "$pdf_file"
+    # Если я нахожусь в папке типа *.pdf или *.PDF то перемещаю файл на уровень вверх
+    # ???
 
-    # Удаляю оригинальный PDF-файл
-    rm "$pdf_file"
+    # Удаляю png-файлы
+    rm *.png *.PNG
 
-    # Конвертирую PDF-страницы в PNG-формат
-    for page in *.pdf; do
-        pdf_to_png "$page"
-    done
-
-    # Удаляю исходные PDF-страницы
-    rm *.pdf
+    # Если папка пуста удаляю данную папку
+    # ???
 
     # возвращаюсь в базовую директорию
     cd "$base_dir"
-
-  else
-    # если файл не pdf - копирую его
-    cp "$file" "../Output/$file"
-  fi
 done
 
