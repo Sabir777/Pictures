@@ -40,7 +40,7 @@ for folder in "${folders[@]}"; do
     name_dir=$(basename "$folder")
 
     # Создаю массив из имен png-файлов
-    mapfile -t png_arr < <(find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.PNG" \))
+    mapfile -t png_arr < <(find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.PNG" \) | sort -V)
 
 
     # Если в папке нет png-файлов: прокрутка цикла
@@ -73,6 +73,10 @@ for folder in "${folders[@]}"; do
         # Собираю pdf-файл
         magick "${png_arr[@]}" "$output_file"
     fi
+
+
+    # Удаляю массив
+    unset png_arr
 
     # Удаляю png-файлы
     find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.PNG" \) -exec rm {} +
