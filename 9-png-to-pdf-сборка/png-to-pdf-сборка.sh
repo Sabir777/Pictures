@@ -36,7 +36,8 @@ find . -type d | while read folder; do
     name_dir=$(basename "$folder")
 
     # Создаю массив из имен png-файлов
-    png_arr=($(ls *.png *.PNG | sort -V))
+    mapfile -t png_arr < <(find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.PNG" \))
+
 
     # Если в папке нет png-файлов: прокрутка цикла
     if [[ ${#png_arr[@]} -eq 0 ]]; then
@@ -47,26 +48,36 @@ find . -type d | while read folder; do
     # Имя выходного файла
     output_file="output.pdf"
 
+
     # Проверяю соответствие текущей папки шаблону
     if [[ "$name_dir" == *.pdf || "$name_dir" == *.PDF ]]; then
         output_file="$name_dir"
 
         # Собираю pdf-файл
-        magick "${png_arr[@]}" "$output_file"
+        magick "${png_arr[@]}" "${output_file/%PDF/pdf}"
+
         # Перемещаю pdf-файл на уровень вверх
-        mv "$output_file" "../$output_file"
+        temp_pdf="$(cd ..;pwd)/${output_file}.temp"
+        mv "$output_file" "$temp_pdf"
     else
         # Собираю pdf-файл
         magick "${png_arr[@]}" "$output_file"
     fi
 
     # Удаляю png-файлы
-    rm *.png *.PNG
+    find . -maxdepth 1 -type f \( -name "*.png" -o -name "*.PNG" \) -exec rm {} +
 
     # возвращаюсь в базовую директорию
     cd "$base_dir"
 
     # Если папка пуста удаляю данную папку
-    rmdir "$folder" 2>/dev/null
+    if [ -z "$(find "$folder" -maxdepth 1 -mindepth 1 -print -quit)" ]; then
+        rmdir "$folder"
+
+        # Возвращаю имя pdf-файлу
+        mv "$temp_pdf" "${temp_pdf%.temp}"
+    fi
+
 done
+
 
