@@ -80,21 +80,18 @@ for folder in "${folders[@]}"; do
     # возвращаюсь в базовую директорию
     cd "$base_dir"
 
-
 done
 
 
 # Удаляю пустые папки и переименовываю временные файлы
-for key in "${!lst_del[@]}"; do
-    temp_pdf="${lst_del[$key]}"
+for folder in "${!lst_del[@]}"; do
+    temp_pdf="${lst_del[$folder]}"
 
-    echo "Папка: $folder"
-    echo "Файл: $temp_pdf"
     # Если папка пуста удаляю данную папку
     if [ -z "$(find "$folder" -maxdepth 1 -mindepth 1 -print -quit)" ]; then
         rmdir "$folder"
 
         # Возвращаю имя pdf-файлу
-        # mv "$temp_pdf" "${temp_pdf%.temp}"
+        mv "$temp_pdf" "${temp_pdf%.temp}"
     fi
 done
