@@ -26,8 +26,12 @@ cd ../Output
 # Запоминаю полное имя базовой директории
 base_dir=$(pwd)
 
+# Создаю словарь для удаления папок и переименования временных файлов
+declare -A lst_del
+
 # Перебираю рекурсивно все папки: в каждой директории проверяю наличие png-файлов и собираю pdf-файл
-find . -type d | while read folder; do
+mapfile -t folders < <(find . -type d)
+for folder in "${folders[@]}"; do
 
     # Перехожу в каждую из папок
     cd "$folder"
@@ -45,12 +49,14 @@ find . -type d | while read folder; do
         continue
     fi
 
-    # Имя выходного файла
+    # Имя для выходного pdf-файла
     output_file="output.pdf"
 
 
     # Проверяю соответствие текущей папки шаблону
     if [[ "$name_dir" == *.pdf || "$name_dir" == *.PDF ]]; then
+
+        # Имя для выходного pdf-файла
         output_file="$name_dir"
 
         # Собираю pdf-файл
@@ -59,6 +65,10 @@ find . -type d | while read folder; do
         # Перемещаю pdf-файл на уровень вверх
         temp_pdf="$(cd ..;pwd)/${output_file}.temp"
         mv "$output_file" "$temp_pdf"
+
+        # Добавляю файл в список на переименование
+        lst_del["$(pwd)"]="$temp_pdf"
+
     else
         # Собираю pdf-файл
         magick "${png_arr[@]}" "$output_file"
@@ -70,14 +80,21 @@ find . -type d | while read folder; do
     # возвращаюсь в базовую директорию
     cd "$base_dir"
 
+
+done
+
+
+# Удаляю пустые папки и переименовываю временные файлы
+for key in "${!lst_del[@]}"; do
+    temp_pdf="${lst_del[$key]}"
+
+    echo "Папка: $folder"
+    echo "Файл: $temp_pdf"
     # Если папка пуста удаляю данную папку
     if [ -z "$(find "$folder" -maxdepth 1 -mindepth 1 -print -quit)" ]; then
         rmdir "$folder"
 
         # Возвращаю имя pdf-файлу
-        mv "$temp_pdf" "${temp_pdf%.temp}"
+        # mv "$temp_pdf" "${temp_pdf%.temp}"
     fi
-
 done
-
-
