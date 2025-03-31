@@ -1,31 +1,25 @@
 #!/bin/bash
 
-#----------5.Улучшить фон, сжать pdf в папках----------#
+#----------5.Агрессивное сжатие PDF----------#
+
+# Данный способ может быть неэффективным. Вначале лучше использовать 4-pdf-to-pdf-сжать - если способ не помог, можно попробывать ЭТОТ способ
 
 # Копирование директорий
 # Сжать pdf: пакетная обработка
-# Скрипт делает фон светлым, сжимает pdf
 # Результат в папке Output
 
 
-# Функция для сжатия PDF с осветлением фона
+# Функция для сжатия PDF
 compress_pdf() {
-    input_pdf="$1"
-    output_png="output.png"
-
+    local input_pdf="$1"
+    local output_png="output.png"
 
     # Получаю png из pdf
-    gs -dNOPAUSE -dBATCH -q \
-       -sDEVICE=png16m \
-       -r180 \
-       -sOutputFile="$output_png" \
-       "$input_pdf"
+    convert -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
 
-    # Осветление фона и увеличение толщины линий
-    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.1 -sharpen 0x5 -level 80%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
     # Сжатие png
-    pngquant --quality=5-10 --speed 1 --ext .png --force "$output_png"
+    pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"
 
     # Сжатие через оптимизацию
     optipng -o7 -strip all -quiet "$output_png"
@@ -33,6 +27,7 @@ compress_pdf() {
     # Финальное сжатие от Google (Zopfli)
     tmp_file="${output_png}.tmp"
     zopflipng --lossy_8bit --lossy_transparent "$output_png" "$tmp_file" && mv -f "$tmp_file" "$output_png"
+
 
     # Преобразую PNG в PDF
     convert "$output_png" "$input_pdf"
