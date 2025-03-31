@@ -48,7 +48,7 @@ tmux send-keys -t Pictures:4.1 'cd 4-pdf-to-pdf-сжать ; vim сжать_pdf.
 tmux new-window -n pic-5 -t Pictures
 
 # Открываю в vim "агрессивное_сжатие_pdf.sh"
-tmux send-keys -t Pictures:5.1 'cd 5-pdf-to-pdf-сжатие ; vim агрессивное_сжатие_pdf.sh' C-m
+tmux send-keys -t Pictures:5.1 'cd 5-pdf-png-pdf-сжатие ; vim агрессивное_сжатие_pdf.sh' C-m
 
 
 # Запускаю 6-е окно: 6-pdf-to-pdf-белый-фон
