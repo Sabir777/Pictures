@@ -9,7 +9,7 @@ fi
 
 
 # Задаю текущую директорию tmux
-cd ~/termux_shared/Pictures/
+cd ~/termux-shared/Pictures/
 
 # Запускаю 1-е окно: 1-pdf-to-png-сжать
 # создаю сессию "Pictures" и окно "pic-1"
