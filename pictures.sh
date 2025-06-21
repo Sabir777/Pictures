@@ -98,6 +98,9 @@ tmux new-window -n pic-11 -t Pictures
 # Открываю в vim "добавить-пустое-место-картинки.sh"
 tmux send-keys -t Pictures:11.1 'cd 11-jpg-добавить-поля ; vim добавить-пустое-место-картинки.sh' C-m
 
+# Переключаюсь в 1-е окно: 1-pdf-to-png-сжать
+tmux select-window -t Pictures:1.1
+
 # Подключаюсь к сессии "Pictures"      
 tmux attach -t Pictures
 
