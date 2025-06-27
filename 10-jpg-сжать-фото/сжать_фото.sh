@@ -15,12 +15,14 @@ find . -type d -exec mkdir -p ../Output/{} \;
 # Нахожу все файлы в папке Input рекурсивно
 # Если файл jpg - конвертирую его, если другого типа - копирую
 find . -type f | while read file; do
-    if [[ "$file" == *.jpg || "$file" == *.JPG ]]; then
-        output_file="../Output/${file/%.JPG/.jpg}"
-        magick "$file" -resize 50% -quality 80 "$output_file"
-        jpegoptim --max=40 "$output_file"
-    else
-        cp "$file" "../Output/$file"
-    fi
+    case "$file" in
+        *.jpg|*.JPG|*.jpeg|*.JPEG)
+          output_file="../Output/${file%.*}.jpg"
+          magick "$file" -resize 50% -quality 80 "$output_file"
+          jpegoptim --max=40 "$output_file"
+          ;;
+        *)
+          cp "$file" "../Output/$file"
+          ;;
+    esac
 done
-
