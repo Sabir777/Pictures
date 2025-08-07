@@ -83,20 +83,28 @@ tmux new-window -n pic-9 -t Pictures
 tmux send-keys -t Pictures:9.1 'cd 9-png-to-pdf-сборка ; vim png-to-pdf-сборка.sh' C-m
 
 
-# Запускаю 10-е окно: 10-jpg-сжать-фото
+# Запускаю 10-е окно: 10-pdf-to-jpg
 # создаю окно "pic-10" в сессии Pictures
 tmux new-window -n pic-10 -t Pictures
 
-# Открываю в vim "сжать_фото.sh"
-tmux send-keys -t Pictures:10.1 'cd 10-jpg-сжать-фото ; vim сжать_фото.sh' C-m
+# Открываю в vim "png-to-jpg.sh"
+tmux send-keys -t Pictures:10.1 'cd 10-pdf-to-jpg ; vim pdf-to-jpg.sh' C-m
 
 
-# Запускаю 11-е окно: 11-jpg-добавить-поля
+# Запускаю 11-е окно: 11-jpg-сжать-фото
 # создаю окно "pic-11" в сессии Pictures
 tmux new-window -n pic-11 -t Pictures
 
+# Открываю в vim "сжать_фото.sh"
+tmux send-keys -t Pictures:11.1 'cd 11-jpg-сжать-фото ; vim сжать_фото.sh' C-m
+
+
+# Запускаю 12-е окно: 12-jpg-добавить-поля
+# создаю окно "pic-12" в сессии Pictures
+tmux new-window -n pic-12 -t Pictures
+
 # Открываю в vim "добавить-пустое-место-картинки.sh"
-tmux send-keys -t Pictures:11.1 'cd 11-jpg-добавить-поля ; vim добавить-пустое-место-картинки.sh' C-m
+tmux send-keys -t Pictures:12.1 'cd 12-jpg-добавить-поля ; vim добавить-пустое-место-картинки.sh' C-m
 
 # Переключаюсь в 1-е окно: 1-pdf-to-png-сжать
 tmux select-window -t Pictures:1.1
