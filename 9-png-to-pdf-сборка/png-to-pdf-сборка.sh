@@ -60,7 +60,7 @@ for folder in "${folders[@]}"; do
         output_file="$name_dir"
 
         # Собираю pdf-файл
-        magick "${png_arr[@]}" "${output_file/%PDF/pdf}"
+        convert "${png_arr[@]}" "${output_file/%PDF/pdf}"
 
         # Перемещаю pdf-файл на уровень вверх
         temp_pdf="$(cd ..;pwd)/${output_file}.temp"
@@ -71,7 +71,7 @@ for folder in "${folders[@]}"; do
 
     else
         # Собираю pdf-файл
-        magick "${png_arr[@]}" "$output_file"
+        convert "${png_arr[@]}" "$output_file"
     fi
 
 

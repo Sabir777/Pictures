@@ -19,7 +19,7 @@ WIDTH=150
 for file in Input/*.pdf; do
   filename=$(basename "$file")
   file_output="Output/${filename%.pdf}.png"
-  magick -density 100 "$file" \
+  convert -density 100 "$file" \
     -alpha off \
     -fuzz 10% -transparent white \
     -resize ${WIDTH}x \

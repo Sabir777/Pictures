@@ -23,7 +23,7 @@ pdf_to_png() {
        "$input_pdf"
 
     # Осветление фона и увеличение толщины линий
-    magick "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
+    convert "$output_png" -alpha off -fuzz 20% -transparent "#e0e0e0" -level 10%,90% -contrast-stretch 5x95% -blur 0x0.3 -sharpen 0x3 -level 40%,100% -morphology Close Diamond -background white -alpha remove -alpha off "$output_png"
 
     # Сжатие png
     pngquant --quality=10-20 --speed 1 --ext .png --force "$output_png"

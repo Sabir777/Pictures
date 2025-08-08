@@ -18,7 +18,7 @@ find . -type f | while read file; do
     case "$file" in
         *.jpg|*.JPG|*.jpeg|*.JPEG)
           output_file="../Output/${file%.*}.jpg"
-          magick "$file" -resize 50% -quality 80 "$output_file"
+          convert "$file" -resize 50% -quality 80 "$output_file"
           jpegoptim --max=40 "$output_file"
           ;;
         *)

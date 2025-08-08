@@ -15,7 +15,7 @@ compress_pdf() {
     local output_png="output.png"
 
     # Получаю png из pdf
-    magick -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
+    convert -density 130 "$input_pdf" -quality 90 -background white -flatten "$output_png"
 
 
     # Сжатие png
@@ -30,7 +30,7 @@ compress_pdf() {
 
 
     # Преобразую PNG в PDF
-    magick "$output_png" "$input_pdf"
+    convert "$output_png" "$input_pdf"
 
     # Удаляю временный PNG
     rm "$output_png"
